@@ -16,7 +16,7 @@
                 </form>
             </p>
         {% else %}
-            <p><a href="{% url 'login' %}">Login</a></p>
+            <p><a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register</a></p>
         {% endif %}
     </header>
     <form method="get">
@@ -25,7 +25,9 @@
     </form>
     {% for escort in page_obj %}
         <div>
-            <p><a href="{% url 'escort_create' %}">Add New Escort</a></p>
+            {% if user.is_authenticated %}
+                <p><a href="{% url 'escort_create' %}">Add New Escort</a></p>
+            {% endif %}
             <h2><a href="{% url 'escort_detail' escort.pk %}">{{ escort.name }}</a></h2>
             {% if escort.profile_image %}
                 <img src="{{ escort.profile_image.url }}" alt="{{ escort.name }}" width="150">

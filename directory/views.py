@@ -1,10 +1,13 @@
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login
 from django.contrib import messages
 from django import forms
 from .models import Escort, Rating
+from .forms import RegisterForm, EscortForm  # Updated to include RegisterForm
 
+# Existing views (unchanged)
 class EscortForm(forms.ModelForm):
     class Meta:
         model = Escort
@@ -65,3 +68,18 @@ def edit_escort_profile(request):
     else:
         form = EscortForm()
     return render(request, 'directory/edit_escort_profile.html', {'form': form})
+
+# New registration view
+def register(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # Log the user in after registration
+            messages.success(request, 'Registration successful! You are now logged in.')
+            return redirect('escort_list')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = RegisterForm()
+    return render(request, 'directory/register.html', {'form': form})
