@@ -30,4 +30,4 @@ class Rating(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('escort', 'user')  # Prevent duplicate ratings by the same user
+        unique_together = ('escort', 'user')
