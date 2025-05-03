@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ escort.name }} Details</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>{{ escort.name }} Details</h1>
+        {% if user.is_authenticated %}
+            <p>Welcome, {{ user.username }} | <a href="{% url 'logout' %}">Logout</a></p>
+        {% else %}
+            <p><a href="{% url 'login' %}">Login</a></p>
+        {% endif %}
+    </header>
+    {% if escort.profile_image %}
+        <img src="{{ escort.profile_image.url }}" alt="{{ escort.name }}" width="200">
+    {% else %}
+        <img src="/media/escort_images/default.jpg" alt="{{ escort.name }}" width="200">
+    {% endif %}
+    <p><strong>City:</strong> {{ escort.city }}</p>
+    <p><strong>Age:</strong> {{ escort.age }} yrs</p>
+    <p><strong>Rates:</strong> {{ escort.rates }}</p>
+    <p><strong>Availability:</strong> {{ escort.availability }}</p>
+    <p><strong>Services:</strong> {{ escort.services }}</p>
+    <p><strong>Bio:</strong> {{ escort.bio }}</p>
+    <p><strong>Rating:</strong> {{ escort.average_rating }}/5</p>
+    {% if user.is_authenticated %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="number" name="rating" min="0" max="5" step="0.1" placeholder="Rate (0-5)">
+            <button type="submit">Submit Rating</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Login</a> to rate this escort.</p>
+    {% endif %}
+    <a href="{% url 'escort_list' %}">Back to List</a>
+</body>
+</html>

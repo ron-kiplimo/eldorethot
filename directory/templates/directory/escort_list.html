@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Escort Listings</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Available Escorts</h1>
+        {% if user.is_authenticated %}
+            <p>Welcome, {{ user.username }} | <a href="{% url 'logout' %}">Logout</a></p>
+        {% else %}
+            <p><a href="{% url 'login' %}">Login</a></p>
+        {% endif %}
+    </header>
+    <form method="get">
+        <input type="text" name="q" placeholder="Search by name or city">
+        <button type="submit">Search</button>
+    </form>
+    {% for escort in page_obj %}
+        <div>
+            <p><a href="{% url 'escort_create' %}">Add New Escort</a></p>
+            <h2><a href="{% url 'escort_detail' escort.pk %}">{{ escort.name }}</a></h2>
+            {% if escort.profile_image %}
+                <img src="{{ escort.profile_image.url }}" alt="{{ escort.name }}" width="150">
+            {% else %}
+                <img src="/media/escort_images/default.jpg" alt="{{ escort.name }}" width="150">
+            {% endif %}
+            <p>{{ escort.city }} | {{ escort.age }} yrs | {{ escort.rates }} | Rating: {{ escort.rating }}/5</p>
+        </div>
+    {% empty %}
+        <p>No escorts available at the moment.</p>
+    {% endfor %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+    </div>
+</body>
+</html>
