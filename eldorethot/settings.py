@@ -99,6 +99,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Media files (Uploads like profile pictures)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # Authentication
 LOGIN_REDIRECT_URL = '/'
@@ -118,3 +120,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For local te
 # EMAIL_HOST_USER = 'your_sendgrid_username'
 # EMAIL_HOST_PASSWORD = 'your_sendgrid_password'
 # DEFAULT_FROM_EMAIL = 'your_email@example.com'
+
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
+
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    '.ngrok-free.app',  # Accepts any ngrok-free subdomain
+]

@@ -1,48 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ escort.name }} Details</title>
+    <title>{{ escort.name }} - Escort Details</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <header>
-        <h1>{{ escort.name }} Details</h1>
+    <header style="background-color: #2c3e50; color: white; padding: 20px; text-align: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+        <h1>{{ escort.name }}</h1>
         {% if user.is_authenticated %}
-            <p>Welcome, {{ user.username }} | 
+            <p style="margin: 10px 0; font-size: 1.1em;">Welcome, {{ user.username }} | 
                 <form method="post" action="{% url 'logout' %}" style="display: inline;">
                     {% csrf_token %}
-                    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; text-decoration: underline;">Logout</button>
+                    <button type="submit" style="background: none; border: none; color: #e74c3c; cursor: pointer; text-decoration: underline; font-weight: bold;">Logout</button>
                 </form>
             </p>
         {% else %}
-            <p><a href="{% url 'login' %}">Login</a></p>
+            <p style="margin: 10px 0; font-size: 1.1em;"><a href="{% url 'login' %}" style="color: #e74c3c; margin-right: 15px; text-decoration: none; font-weight: bold;">Login</a> | <a href="{% url 'register' %}" style="color: #e74c3c; text-decoration: none; font-weight: bold;">Register</a></p>
         {% endif %}
     </header>
-    {% if escort.profile_image %}
-        <img src="{{ escort.profile_image.url }}" alt="{{ escort.name }}" width="200">
-    {% else %}
-        <img src="/media/escort_images/default.jpg" alt="{{ escort.name }}" width="200">
-    {% endif %}
-    <p><strong>City:</strong> {{ escort.city }}</p>
-    <p><strong>Age:</strong> {{ escort.age }} yrs</p>
-    <p><strong>Rates:</strong> {{ escort.rates }}</p>
-    <p><strong>Availability:</strong> {{ escort.availability }}</p>
-    <p><strong>Services:</strong> {{ escort.services }}</p>
-    <p><strong>Bio:</strong> {{ escort.bio }}</p>
-    <p><strong>Rating:</strong> {{ escort.average_rating }}/5</p>
-    {% if escort.phone_number %}
-        <p><strong>Phone:</strong> {{ escort.phone_number }}</p>
-    {% endif %}
-    {% if user.is_authenticated %}
-        <form method="post">
-            {% csrf_token %}
-            <input type="number" name="rating" min="0" max="5" step="0.1" placeholder="Rate (0-5)">
-            <button type="submit">Submit Rating</button>
-        </form>
-    {% else %}
-        <p><a href="{% url 'login' %}">Login</a> to rate this escort.</p>
-    {% endif %}
-    <a href="{% url 'escort_list' %}">Back to List</a>
+    <div style="max-width: 600px; margin: 20px auto; padding: 15px; background: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); text-align: center;">
+        {% if escort.profile_image %}
+            <img src="{{ escort.profile_image.url|default:'/static/images/placeholder.jpg' }}" alt="{{ escort.name }}" style="width: 200px; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 10px;">
+        {% else %}
+            <img src="/static/images/placeholder.jpg" alt="{{ escort.name }}" style="width: 200px; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 10px;">
+        {% endif %}
+        <h2 style="margin: 10px 0; font-size: 1.5em; color: #2c3e50;">{{ escort.name }}</h2>
+        {% if show_details %}
+            <p style="margin: 5px 0; color: #7f8c8d;">{{ escort.city }} | {{ escort.age }} yrs | {{ escort.rates }} | Rating: {{ escort.average_rating|default:'N/A' }}/5</p>
+            {% if escort.services %}
+                <p style="margin: 5px 0; color: #7f8c8d;">Services: {{ escort.services }}</p>
+            {% endif %}
+            {% if escort.availability %}
+                <p style="margin: 5px 0; color: #7f8c8d;">Availability: {{ escort.availability }}</p>
+            {% endif %}
+            {% if escort.bio %}
+                <p style="margin: 5px 0; color: #7f8c8d;">Bio: {{ escort.bio }}</p>
+            {% endif %}
+            {% if escort.phone_number %}
+                <p style="margin: 5px 0; color: #7f8c8d;">Phone: {{ escort.phone_number }} 
+                    <a href="tel:{{ escort.phone_number }}" style="display: inline-block; margin-left: 10px; padding: 8px 15px; background-color: #2ecc71; color: white; border-radius: 20px; text-decoration: none; font-weight: bold;">Call</a>
+                </p>
+            {% endif %}
+        {% else %}
+            <p style="margin: 10px 0; color: #e74c3c;">A subscription of Ksh.499 for 30 days is required to view full details. Please complete payment via the "Be an Escort" form.</p>
+        {% endif %}
+        {% if user.is_authenticated and escort.user == user %}
+            <p style="margin: 10px 0;"><a href="{% url 'edit_escort_profile' %}" style="color: #e74c3c; text-decoration: none; font-weight: bold;">Edit Profile</a></p>
+        {% endif %}
+    </div>
 </body>
 </html>

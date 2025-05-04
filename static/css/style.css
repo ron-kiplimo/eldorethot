@@ -1,79 +1,169 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    line-height: 1.6;
 }
+
 header {
-    background-color: #0066cc;
+    background-color: #2c3e50;
     color: white;
+    padding: 20px;
     text-align: center;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
 header h1 {
     margin: 0;
-    font-size: 24px;
+    font-size: 2.5em;
+    font-weight: bold;
 }
-header p {
-    margin: 0;
-    font-size: 14px;
+
+form input[type="text"] {
+    padding: 12px;
+    width: 70%;
+    max-width: 400px;
+    border: 2px solid #ddd;
+    border-radius: 25px;
+    font-size: 1em;
+    outline: none;
 }
-header a {
-    color: white;
-}
-div {
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin: 10px;
-    background-color: #fff;
-    border-radius: 5px;
-}
-img {
-    border-radius: 5px;
-    max-width: 150px;
-    height: auto;
-}
-a {
-    color: #0066cc;
-    text-decoration: none;
-}
-a:hover {
-    text-decoration: underline;
-}
-form {
-    margin: 20px 0;
-    text-align: center;
-}
-input[type="text"], input[type="number"] {
-    padding: 5px;
-    width: 200px;
-    margin-right: 10px;
-}
-button {
-    padding: 5px 10px;
-    background-color: #0066cc;
+
+form button {
+    padding: 12px 25px;
+    background-color: #e74c3c;
     color: white;
     border: none;
+    border-radius: 25px;
     cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
 }
-button:hover {
-    background-color: #004d99;
+
+form button:hover {
+    background-color: #c0392b;
 }
-.pagination {
+
+div div {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-    margin: 20px 0;
+    transition: transform 0.2s;
 }
-@media (max-width: 600px) {
-    header {
-        flex-direction: column;
+
+div div:hover {
+    transform: scale(1.05);
+}
+
+div div h2 {
+    margin: 10px 0;
+    font-size: 1.5em;
+    color: #2c3e50;
+}
+
+div div h2 a {
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+div div img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+div div p {
+    margin: 5px 0;
+    color: #7f8c8d;
+}
+
+div div a[href^="tel:"] {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 8px 15px;
+    background-color: #2ecc71;
+    color: white;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+div div a[href^="tel:"]:hover {
+    background-color: #27ae60;
+}
+
+.pagination a {
+    color: #e74c3c;
+    margin: 0 15px;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    text-decoration: underline;
+}
+
+.pagination span {
+    color: #2c3e50;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2em;
     }
-    input[type="text"], input[type="number"] {
+
+    form input[type="text"] {
+        width: 80%;
+        max-width: 300px;
+    }
+
+    div div img {
         width: 150px;
+        height: 150px;
     }
-    img {
-        max-width: 100px;
+
+    div div h2 {
+        font-size: 1.2em;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        padding: 15px;
+    }
+
+    form input[type="text"] {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    form button {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    div div {
+        padding: 10px;
+    }
+
+    div div img {
+        width: 120px;
+        height: 120px;
+    }
+
+    div div h2 {
+        font-size: 1em;
+    }
+
+    .pagination a, .pagination span {
+        display: block;
+        margin: 5px 0;
     }
 }

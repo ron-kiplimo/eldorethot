@@ -1,34 +1,42 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 class Escort(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
-    age = models.IntegerField()
     city = models.CharField(max_length=100)
-    services = models.TextField(help_text="Comma-separated list, e.g., massage, dinner dates")
-    rates = models.CharField(max_length=100, help_text="Example: KES 5000/hr")
-    availability = models.CharField(max_length=100, help_text="Example: Mon-Fri, 10am-10pm")
-    profile_image = models.ImageField(upload_to='escort_images/', default='escort_images/default.jpg', null=True, blank=True)
-    bio = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    phone_number = models.CharField(max_length=20, blank=True, null=True, help_text="Enter a valid phone number, e.g., +254712345678")
+    age = models.IntegerField()
+    rates = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    profile_image = models.ImageField(upload_to='escort_images/', blank=True, null=True)
+    average_rating = models.FloatField(default=0.0)
+    # Added fields to match EscortForm
+    services = models.TextField(blank=True, null=True)  # For listing services offered
+    availability = models.CharField(max_length=100, blank=True, null=True)  # E.g., "Weekdays", "Weekends"
+    bio = models.TextField(blank=True, null=True)  # Short biography
 
     def __str__(self):
         return self.name
 
-    @property
-    def average_rating(self):
-        ratings = self.ratings.all()
-        if ratings.exists():
-            return round(sum(rating.value for rating in ratings) / ratings.count(), 1)
-        return 0.0
+class Subscription(models.Model):
+    escort = models.ForeignKey(Escort, on_delete=models.CASCADE, related_name='subscriptions')
+    start_date = models.DateTimeField(default=timezone.now)
+    end_date = models.DateTimeField()
+    is_active = models.BooleanField(default=False)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=499.00)
 
-class Rating(models.Model):
-    escort = models.ForeignKey(Escort, related_name='ratings', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    value = models.FloatField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    def save(self, *args, **kwargs):
+        if not self.end_date:
+            self.end_date = self.start_date + timezone.timedelta(days=30)
+        super().save(*args, **kwargs)
 
-    class Meta:
-        unique_together = ('escort', 'user')
+    def check_status(self):
+        now = timezone.now()
+        if now > self.end_date:
+            self.is_active = False
+            self.save()
+        return self.is_active
+
+    def __str__(self):
+        return f"Subscription for {self.escort.name} - Active: {self.is_active}"
