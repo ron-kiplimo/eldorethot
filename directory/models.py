@@ -12,6 +12,7 @@ class Escort(models.Model):
     profile_image = models.ImageField(upload_to='escort_images/', default='escort_images/default.jpg', null=True, blank=True)
     bio = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True, help_text="Enter a valid phone number, e.g., +254712345678")
 
     def __str__(self):
         return self.name

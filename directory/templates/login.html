@@ -8,21 +8,23 @@
 <body>
     <header>
         <h1>Login</h1>
+        {% if user.is_authenticated %}
+            <p>Welcome, {{ user.username }} | 
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="background: none; border: none; color: #0066cc; cursor: pointer; text-decoration: underline;">Logout</button>
+                </form>
+            </p>
+        {% else %}
+            <p>Already logged in? <a href="{% url 'escort_list' %}">Go to Escort List</a></p>
+        {% endif %}
     </header>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Login</button>
     </form>
-    {% if user.is_authenticated %}
-        <p>
-            <form method="post" action="{% url 'logout' %}" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" style="background: none; border: none; color: #0066cc; cursor: pointer; text-decoration: underline;">Logout</button>
-            </form>
-        </p>
-    {% else %}
-        <p>Already logged in? <a href="{% url 'escort_list' %}">Go to Escort List</a></p>
-    {% endif %}
+    <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+    <p><a href="{% url 'password_reset' %}">Forgot Password?</a></p>
 </body>
 </html>

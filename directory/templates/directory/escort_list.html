@@ -26,7 +26,7 @@
     {% for escort in page_obj %}
         <div>
             {% if user.is_authenticated %}
-                <p><a href="{% url 'escort_create' %}">Add New Escort</a></p>
+                <p><a href="{% url 'escort_create' %}">Be an Escort</a></p>
             {% endif %}
             <h2><a href="{% url 'escort_detail' escort.pk %}">{{ escort.name }}</a></h2>
             {% if escort.profile_image %}
@@ -35,6 +35,9 @@
                 <img src="/media/escort_images/default.jpg" alt="{{ escort.name }}" width="150">
             {% endif %}
             <p>{{ escort.city }} | {{ escort.age }} yrs | {{ escort.rates }} | Rating: {{ escort.average_rating }}/5</p>
+            {% if escort.phone_number %}
+                <p>Phone: {{ escort.phone_number }}</p>
+            {% endif %}
         </div>
     {% empty %}
         <p>No escorts available at the moment.</p>

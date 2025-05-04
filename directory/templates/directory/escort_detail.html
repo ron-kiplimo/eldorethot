@@ -31,6 +31,9 @@
     <p><strong>Services:</strong> {{ escort.services }}</p>
     <p><strong>Bio:</strong> {{ escort.bio }}</p>
     <p><strong>Rating:</strong> {{ escort.average_rating }}/5</p>
+    {% if escort.phone_number %}
+        <p><strong>Phone:</strong> {{ escort.phone_number }}</p>
+    {% endif %}
     {% if user.is_authenticated %}
         <form method="post">
             {% csrf_token %}
