@@ -18,11 +18,11 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # M-PESA API Credentials (Replace with your own from Daraja API)
-MPESA_CONSUMER_KEY = "e5kpRccaSHpkAsNX64FtGjORP7q2oTeuZCHA0QQbHVSuvTCh"  # Replace with your full Consumer Key
-MPESA_CONSUMER_SECRET = "TR5ATBchQEXFVyheJgi3GwbMYQbUxaTfL3CDHNFDnbK5gzTeAVnusOpePaVLYVKC"  # Replace with your full Consumer Secret
-MPESA_SHORTCODE = "9009227"  # Use default sandbox shortcode unless 9009227 is confirmed
+MPESA_CONSUMER_KEY = "nxu6_..."  # Replace with your full Consumer Key
+MPESA_CONSUMER_SECRET = "vyxc..."  # Replace with your full Consumer Secret
+MPESA_SHORTCODE = "174379"  # Use default sandbox shortcode unless 9009227 is confirmed
 MPESA_PASSKEY = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"  # Replace with your passkey
-MPESA_CALLBACK_URL = "https://7b58-102-211-145-75.ngrok-free.app/"  # Replace with a publicly accessible URL (e.g., ngrok)
+MPESA_CALLBACK_URL = "https://yourdomain.com/payment/callback/"  # Replace with a publicly accessible URL (e.g., ngrok)
 
 def get_mpesa_access_token():
     if MPESA_CONSUMER_KEY == "your_consumer_key" or MPESA_CONSUMER_SECRET == "your_consumer_secret":
@@ -85,6 +85,7 @@ def escort_create(request):
         if form.is_valid():
             escort = form.save(commit=False)
             escort.user = request.user
+            escort.is_active = False  # Initially inactive until payment is confirmed
             escort.save()
             # Format phone number to 2547XXXXXXXX
             phone_number = escort.phone_number
@@ -100,10 +101,14 @@ def escort_create(request):
                 if payment_response.get("ResponseCode") == "0":
                     return render(request, 'directory/payment_pending.html', {'escort': escort})
                 else:
+                    # If payment initiation fails, delete the escort or keep it inactive
+                    escort.delete()
                     messages.error(request, "Payment initiation failed. Please try again.")
                     return render(request, 'directory/escort_create.html', {'form': form})
             except Exception as e:
                 logger.error(f"Error during payment initiation: {str(e)}")
+                # Delete the escort if payment fails
+                escort.delete()
                 messages.error(request, f"Payment initiation failed: {str(e)}")
                 return render(request, 'directory/escort_create.html', {'form': form})
     else:
@@ -127,8 +132,17 @@ def payment_callback(request):
                 amount=amount,
                 is_active=True
             )
+            # Activate the escort profile
+            escort.is_active = True
+            escort.save()
             return HttpResponse("Payment successful")
-        return HttpResponse("Payment failed")
+        else:
+            # If payment fails, keep the escort inactive or delete it
+            account_reference = data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"]
+            escort_id = account_reference.split('-')[1]
+            escort = get_object_or_404(Escort, id=escort_id)
+            escort.delete()  # Optional: Delete if payment fails
+            return HttpResponse("Payment failed")
     except Exception as e:
         logger.error(f"Error in payment callback: {str(e)}")
         return HttpResponse("Payment callback processing failed")
@@ -136,9 +150,9 @@ def payment_callback(request):
 def escort_list(request):
     query = request.GET.get('q')
     if query:
-        escorts = Escort.objects.filter(name__icontains=query) | Escort.objects.filter(city__icontains=query)
+        escorts = Escort.objects.filter(is_active=True).filter(name__icontains=query) | Escort.objects.filter(is_active=True).filter(city__icontains=query)
     else:
-        escorts = Escort.objects.all()
+        escorts = Escort.objects.filter(is_active=True)
     escorts = escorts.order_by('name')  # Ensure consistent ordering for pagination
     paginator = Paginator(escorts, 10)
     page_number = request.GET.get('page')
@@ -147,6 +161,9 @@ def escort_list(request):
 
 def escort_detail(request, pk):
     escort = get_object_or_404(Escort, pk=pk)
+    if not escort.is_active:
+        messages.error(request, "This escort profile is not active.")
+        return redirect('escort_list')
     subscription = Subscription.objects.filter(escort=escort, is_active=True).first()
     if subscription:
         subscription.check_status()  # Check if subscription is still active
@@ -171,6 +188,9 @@ def register(request):
 @login_required
 def edit_escort_profile(request):
     escort = get_object_or_404(Escort, user=request.user)
+    if not escort.is_active:
+        messages.error(request, "This escort profile is not active.")
+        return redirect('escort_list')
     if request.method == 'POST':
         form = EscortForm(request.POST, request.FILES, instance=escort)
         if form.is_valid():

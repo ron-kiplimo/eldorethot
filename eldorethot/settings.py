@@ -128,3 +128,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '.ngrok-free.app',  # Accepts any ngrok-free subdomain
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://7b58-102-211-145-75.ngrok-free.app',
+]
