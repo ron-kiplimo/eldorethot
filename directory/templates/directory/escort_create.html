@@ -18,6 +18,14 @@
         {% else %}
             <p><a href="{% url 'login' %}">Login</a></p>
         {% endif %}
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="{% url 'escort_list' %}">Home</a></li>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#contact">Contact Us</a></li>
+            </ul>
+        </div>
     </header>
     {% if messages %}
         {% for message in messages %}

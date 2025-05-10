@@ -12,20 +12,23 @@ import json
 import base64
 from datetime import datetime
 import logging
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import RegisterForm
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # M-PESA API Credentials (Replace with your own from Daraja API)
-MPESA_CONSUMER_KEY = "nxu6_..."  # Replace with your full Consumer Key
-MPESA_CONSUMER_SECRET = "vyxc..."  # Replace with your full Consumer Secret
+MPESA_CONSUMER_KEY = "e5kpRccaSHpkAsNX64FtGjORP7q2oTeuZCHA0QQbHVSuvTCh"  # Replace with your full Consumer Key
+MPESA_CONSUMER_SECRET = "TR5ATBchQEXFVyheJgi3GwbMYQbUxaTfL3CDHNFDnbK5gzTeAVnusOpePaVLYVKC"  # Replace with your full Consumer Secret
 MPESA_SHORTCODE = "174379"  # Use default sandbox shortcode unless 9009227 is confirmed
 MPESA_PASSKEY = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"  # Replace with your passkey
 MPESA_CALLBACK_URL = "https://yourdomain.com/payment/callback/"  # Replace with a publicly accessible URL (e.g., ngrok)
 
 def get_mpesa_access_token():
-    if MPESA_CONSUMER_KEY == "your_consumer_key" or MPESA_CONSUMER_SECRET == "your_consumer_secret":
+    if MPESA_CONSUMER_KEY == "e5kpRccaSHpkAsNX64FtGjORP7q2oTeuZCHA0QQbHVSuvTCh" or MPESA_CONSUMER_SECRET == "TR5ATBchQEXFVyheJgi3GwbMYQbUxaTfL3CDHNFDnbK5gzTeAVnusOpePaVLYVKC":
         logger.error("M-PESA credentials are not set. Please update MPESA_CONSUMER_KEY and MPESA_CONSUMER_SECRET.")
         raise ValueError("M-PESA credentials are not configured. Please set MPESA_CONSUMER_KEY and MPESA_CONSUMER_SECRET.")
 
@@ -170,20 +173,19 @@ def escort_detail(request, pk):
     show_details = subscription and subscription.is_active
     return render(request, 'directory/escort_detail.html', {'escort': escort, 'show_details': show_details})
 
+
+
 def register(request):
-    if request.user.is_authenticated:
-        return redirect('escort_list')  # Redirect authenticated users
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Registration successful! You can now log in.")
+            messages.success(request, 'Registration successful. You can now log in.')
             return redirect('login')
-        else:
-            messages.error(request, "Registration failed. Please correct the errors below.")
     else:
-        form = UserCreationForm()
-    return render(request, 'directory/register.html', {'form': form})
+        form = RegisterForm()
+    return render(request, 'register.html', {'form': form})
+
 
 @login_required
 def edit_escort_profile(request):
