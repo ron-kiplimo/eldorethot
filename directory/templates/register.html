@@ -20,10 +20,12 @@
         {% endif %}
     </header>
     {% if messages %}
-        {% for message in messages %}
-            <p style="color: {% if 'error' in message.tags %}red{% else %}green{% endif %}; text-align: center;">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
+    {% for message in messages %}
+        <div class="alert {% if 'error' in message.tags %}alert-danger{% else %}alert-success{% endif %} text-center" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
     <div style="max-width: 400px; margin: 20px auto; padding: 15px; background: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
         <form method="post">
             {% csrf_token %}

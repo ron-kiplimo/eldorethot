@@ -132,3 +132,5 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     'https://7b58-102-211-145-75.ngrok-free.app',
 ]
+
+LOGIN_REDIRECT_URL = '/dashboard/'  # or use the name of the URL pattern

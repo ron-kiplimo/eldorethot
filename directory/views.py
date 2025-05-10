@@ -16,6 +16,18 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import RegisterForm
 
+
+def escort_dashboard(request):
+    # Assuming the escort is related to the user
+    escort = request.user.escort if hasattr(request.user, 'escort') else None
+    return render(request, 'escort_dashboard.html', {'escort': escort})
+
+
+@login_required
+def escort_dashboard(request):
+    return render(request, 'escort_dashboard.html')
+
+
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
