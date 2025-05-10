@@ -14,14 +14,24 @@ from pathlib import Path
 import os
 import dj_database_url
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
-SECRET_KEY = 'django-insecure--=2gdel0z-w59)phhr9@hgjk7h4y5jh@o#z98e0uz&lvvh6b5d'
-DEBUG = True
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure--=2gdel0z-w59)phhr9@hgjk7h4y5jh@o#z98e0uz&lvvh6b5d')
+DEBUG = os.getenv('RENDER') != 'true'  # False on Render, True locally
+
+# Hosts
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    '.onrender.com',
+    '.ngrok-free.app',  # Accepts any ngrok-free subdomain
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://7b58-102-211-145-75.ngrok-free.app',
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -36,6 +46,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -65,10 +76,7 @@ WSGI_APPLICATION = 'eldorethot.wsgi.application'
 
 # Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(default='sqlite:///db.sqlite3')
 }
 
 # Password validation
@@ -97,22 +105,18 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files (Uploads like profile pictures)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_ROOT = BASE_DIR / 'media'
-
 
 # Authentication
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/login/'
-
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 LOGOUT_REDIRECT_URL = '/'
 
+# Email Backend
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For local testing, prints to console
 # For production (e.g., Render with SendGrid), uncomment and configure:
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -125,38 +129,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For local te
 
 AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
 
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    '.ngrok-free.app',  # Accepts any ngrok-free subdomain
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://7b58-102-211-145-75.ngrok-free.app',
-]
-
-LOGIN_REDIRECT_URL = '/dashboard/'  # or use the name of the URL pattern
-
-import os
-DEBUG = os.getenv('RENDER') != 'true'  # False on Render, True locally
-
-ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
-
-MIDDLEWARE = [
-    ...
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    ...
-]
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-import dj_database_url
-DATABASES = {
-    'default': dj_database_url.config(default='sqlite:///db.sqlite3')
-}
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
